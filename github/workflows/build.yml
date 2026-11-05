@@ -1,0 +1,54 @@
+
+name: Crear APK - Recuerdos Animados
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Extraer proyecto Android
+        id: project
+        run: |
+          ZIP_FILE="$(find . -maxdepth 2 -type f -iname '*.zip' -print -quit)"
+          if [ -z "$ZIP_FILE" ]; then
+            echo "No se encontró el archivo ZIP"
+            exit 1
+          fi
+          mkdir -p extracted
+          unzip -q "$ZIP_FILE" -d extracted
+          GRADLEW="$(find extracted -type f -name gradlew -print -quit)"
+          if [ -z "$GRADLEW" ]; then
+            echo "No se encontró gradlew. El ZIP debe contener un proyecto Android Gradle."
+            exit 1
+          fi
+          PROJECT_DIR="$(dirname "$GRADLEW")"
+          echo "project_dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          chmod +x "$GRADLEW"
+
+      - name: Instalar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Compilar APK
+        working-directory: ${{ steps.project.outputs.project_dir }}
+        run: ./gradlew assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Recuerdos-Animados-APK
+          path: extracted/**/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
