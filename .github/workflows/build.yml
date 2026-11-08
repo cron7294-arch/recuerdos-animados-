@@ -27,10 +27,7 @@ jobs:
           PROJECT_DIR="$(dirname "$(find proyecto -name settings.gradle.kts -print -quit)")"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
-      - name: Instalar Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+      
 
       - name: Compilar aplicación
         run: gradle -p "$PROJECT_DIR" assembleDebug
