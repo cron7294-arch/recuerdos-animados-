@@ -10,7 +10,6 @@ name: Crear APK de Recuerdos Animados
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
@@ -24,11 +23,14 @@ jobs:
       - name: Extraer proyecto Android
         run: |
           unzip -q RecuerdosAnimadosAndroid.zip -d proyecto
-          PROJECT_DIR="$(dirname "$(find proyecto -type f \( -name settings.gradle.kts -o -name settings.gradle \) -print -quit)")"
-          if [ "$PROJECT_DIR" = "." ] || [ -z "$PROJECT_DIR" ]; then
-            echo "No se encontró el archivo settings.gradle"
+          SETTINGS_FILE="$(find proyecto -type f \( -name settings.gradle.kts -o -name settings.gradle \) -print -quit)"
+          if [ -z "$SETTINGS_FILE" ]; then
+            echo "No se encontró el archivo de configuración de Gradle"
+            find proyecto -maxdepth 4 -type f | head -80
             exit 1
           fi
+          PROJECT_DIR="$(dirname "$SETTINGS_FILE")"
+          echo "Proyecto Android encontrado en: $PROJECT_DIR"
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Instalar Gradle
@@ -45,4 +47,3 @@ jobs:
           name: Recuerdos-Animados-APK
           path: proyecto/**/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          
