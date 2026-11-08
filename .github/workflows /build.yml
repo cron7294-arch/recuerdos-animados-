@@ -1,4 +1,5 @@
-YAML
+
+
 name: Crear APK de Recuerdos Animados
 
 on:
@@ -24,7 +25,11 @@ jobs:
       - name: Extraer proyecto Android
         run: |
           unzip -q RecuerdosAnimadosAndroid.zip -d proyecto
-          PROJECT_DIR="$(dirname "$(find proyecto -name settings.gradle.kts -print -quit)")"
+          PROJECT_DIR="$(find proyecto -type f -name settings.gradle.kts -print -quit | xargs -r dirname)"
+          if [ -z "$PROJECT_DIR" ]; then
+            echo "No se encontró settings.gradle.kts"
+            exit 1
+          fi
           echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
 
       - name: Instalar Gradle
@@ -39,4 +44,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Recuerdos-Animados-APK
-          path: proyecto/**/app/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
