@@ -29,8 +29,8 @@ jobs:
 
       
 
-      - name: aplicación
-        run: |
+          - name:compilar aplicación
+           run: 
           for intento in 1 2 3; do
             echo "Intento $intento de 3"
             if gradle -p "$PROJECT_DIR" assembleDebug; then
