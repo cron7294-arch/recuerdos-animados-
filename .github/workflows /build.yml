@@ -1,7 +1,8 @@
 
 
 name: Crear APK de Recuerdos Animados
-
+# iniciar compilación APK
+ 
 on:
   push:
     branches:
