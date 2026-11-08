@@ -1,7 +1,7 @@
 YAML
 name: Crear APK de Recuerdos Animados
 
-on:
+'on':
   push:
     branches:
       - main
